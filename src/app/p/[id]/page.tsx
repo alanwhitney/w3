@@ -1,19 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PrintButton } from "@/components/PrintButton";
-
-function formatWhen(date: string | null, time: string | null) {
-  if (!date) return null;
-  const d = new Date(`${date}T${time ?? "00:00"}`);
-  const dateStr = d.toLocaleDateString(undefined, {
-    weekday: "short",
-    month: "short",
-    day: "numeric",
-  });
-  if (!time) return dateStr;
-  const timeStr = d.toLocaleTimeString(undefined, { hour: "numeric", minute: "2-digit" });
-  return `${dateStr} · ${timeStr}`;
-}
+import { formatWhen } from "@/lib/datetime";
 
 export default async function PublicListPage({
   params,

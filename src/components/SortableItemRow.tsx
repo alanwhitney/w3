@@ -2,6 +2,7 @@
 
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import { DateInput } from "@/components/DateInput";
 import type { Tables } from "@/lib/supabase/database.types";
 
 type Item = Tables<"w3_items">;
@@ -57,10 +58,9 @@ export function SortableItemRow({
           placeholder="What"
           className={`rounded border border-transparent px-2 py-1 hover:border-zinc-200 focus:border-zinc-400 ${item.completed ? "text-zinc-400 line-through" : ""}`}
         />
-        <input
-          type="date"
+        <DateInput
           value={item.when_date ?? ""}
-          onChange={(e) => onChange({ when_date: e.target.value || null })}
+          onChange={(v) => onChange({ when_date: v || null })}
           className="rounded border border-transparent px-2 py-1 hover:border-zinc-200 focus:border-zinc-400"
         />
         <input

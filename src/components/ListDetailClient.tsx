@@ -22,6 +22,7 @@ import {
   deleteList,
 } from "@/app/lists/actions";
 import { createItem, deleteItem, reorderItems, updateItem } from "@/app/lists/[id]/actions";
+import { DateInput } from "@/components/DateInput";
 import { SortableItemRow } from "@/components/SortableItemRow";
 import type { Tables } from "@/lib/supabase/database.types";
 
@@ -202,10 +203,9 @@ export function ListDetailClient({
           placeholder="What"
           className="rounded border border-zinc-300 px-2 py-1 outline-none focus:border-zinc-500"
         />
-        <input
-          type="date"
+        <DateInput
           value={newDate}
-          onChange={(e) => setNewDate(e.target.value)}
+          onChange={setNewDate}
           className="rounded border border-zinc-300 px-2 py-1 outline-none focus:border-zinc-500"
         />
         <input
