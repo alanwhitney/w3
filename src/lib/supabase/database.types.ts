@@ -17,6 +17,7 @@ export type Database = {
           completed: boolean
           created_at: string
           id: string
+          indent: boolean
           list_id: string
           position: number
           updated_at: string
@@ -29,6 +30,7 @@ export type Database = {
           completed?: boolean
           created_at?: string
           id?: string
+          indent?: boolean
           list_id: string
           position?: number
           updated_at?: string
@@ -41,6 +43,7 @@ export type Database = {
           completed?: boolean
           created_at?: string
           id?: string
+          indent?: boolean
           list_id?: string
           position?: number
           updated_at?: string

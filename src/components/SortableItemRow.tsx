@@ -28,7 +28,7 @@ export function SortableItemRow({
     <div
       ref={setNodeRef}
       style={style}
-      className="flex items-start gap-2 rounded-md border border-zinc-200 bg-white p-3"
+      className={`flex items-start gap-2 rounded-md border border-zinc-200 bg-white p-3 ${item.indent ? "ml-8" : ""}`}
     >
       <button
         {...attributes}

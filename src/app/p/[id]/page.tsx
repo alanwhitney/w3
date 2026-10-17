@@ -49,7 +49,10 @@ export default async function PublicListPage({
           {items.map((item) => {
             const when = formatWhen(item.when_date, item.when_time);
             return (
-              <div key={item.id} className="flex items-start justify-between gap-4 py-3">
+              <div
+                key={item.id}
+                className={`flex items-start justify-between gap-4 py-3 ${item.indent ? "ml-8" : ""}`}
+              >
                 <div>
                   <p className={`font-medium ${item.completed ? "text-zinc-400 line-through" : "text-zinc-900"}`}>
                     {item.what || "(no description)"}

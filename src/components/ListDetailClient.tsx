@@ -59,15 +59,38 @@ export function ListDetailClient({
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
 
-  async function handleDragEnd(event: DragEndEvent) {
-    const { active, over } = event;
-    if (!over || active.id === over.id) return;
+  const INDENT_DRAG_THRESHOLD = 40;
 
-    const oldIndex = items.findIndex((i) => i.id === active.id);
-    const newIndex = items.findIndex((i) => i.id === over.id);
-    const reordered = arrayMove(items, oldIndex, newIndex);
-    setItems(reordered);
-    await reorderItems(list.id, reordered.map((i) => i.id));
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over, delta } = event;
+    if (!over) return;
+
+    const draggedItem = items.find((i) => i.id === active.id);
+    if (!draggedItem) return;
+
+    let indent = draggedItem.indent;
+    if (delta.x > INDENT_DRAG_THRESHOLD) indent = true;
+    else if (delta.x < -INDENT_DRAG_THRESHOLD) indent = false;
+
+    let reordered = items;
+    if (active.id !== over.id) {
+      const oldIndex = items.findIndex((i) => i.id === active.id);
+      const newIndex = items.findIndex((i) => i.id === over.id);
+      reordered = arrayMove(items, oldIndex, newIndex);
+    }
+
+    if (indent !== draggedItem.indent || reordered !== items) {
+      setItems(
+        reordered.map((i) => (i.id === active.id ? { ...i, indent } : i)),
+      );
+    }
+
+    if (active.id !== over.id) {
+      await reorderItems(list.id, reordered.map((i) => i.id));
+    }
+    if (indent !== draggedItem.indent) {
+      await updateItem(list.id, active.id as string, { indent });
+    }
   }
 
   function patchItemLocally(id: string, patch: Partial<Item>) {
