@@ -14,12 +14,14 @@ export function AuthForm({
   submitLabel,
   altHref,
   altLabel,
+  showForgotPassword,
 }: {
   action: AuthAction;
   heading: string;
   submitLabel: string;
   altHref: string;
   altLabel: string;
+  showForgotPassword?: boolean;
 }) {
   const [state, formAction, pending] = useActionState(action, undefined);
 
@@ -44,9 +46,16 @@ export function AuthForm({
             />
           </div>
           <div className="flex flex-col gap-1">
-            <label htmlFor="password" className="text-sm font-medium text-zinc-600">
-              Password
-            </label>
+            <div className="flex items-baseline justify-between">
+              <label htmlFor="password" className="text-sm font-medium text-zinc-600">
+                Password
+              </label>
+              {showForgotPassword && (
+                <Link href="/forgot-password" className="text-sm text-zinc-500 underline hover:text-zinc-900">
+                  Forgot password?
+                </Link>
+              )}
+            </div>
             <input
               id="password"
               name="password"

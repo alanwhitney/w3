@@ -34,6 +34,8 @@ export async function updateSession(request: NextRequest) {
   const isPublicRoute =
     path.startsWith("/login") ||
     path.startsWith("/signup") ||
+    path.startsWith("/forgot-password") ||
+    path.startsWith("/auth/") ||
     path.startsWith("/p/");
 
   if (!user && !isPublicRoute) {
