@@ -19,6 +19,9 @@ export default async function ListsPage() {
         <h1 className="text-2xl font-semibold tracking-tight">W3</h1>
         <div className="flex items-center gap-4 text-sm text-zinc-600">
           <span>{user?.email}</span>
+          <a href="/www.pdf" download="W3-blank-form.pdf" className="font-medium text-zinc-900 underline">
+            Download blank PDF
+          </a>
           <form action={logout}>
             <button className="font-medium text-zinc-900 underline" type="submit">
               Log out
