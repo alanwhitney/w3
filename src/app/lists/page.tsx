@@ -11,6 +11,7 @@ export default async function ListsPage() {
   const { data: lists } = await supabase
     .from("w3_lists")
     .select("*, w3_items(id, completed)")
+    .order("position", { ascending: true })
     .order("created_at", { ascending: false });
 
   return (

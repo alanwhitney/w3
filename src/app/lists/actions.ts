@@ -70,6 +70,16 @@ export async function setListColor(listId: string, color: ListColor | null) {
   revalidatePath(`/lists/${listId}`);
 }
 
+export async function reorderLists(orderedIds: string[]) {
+  const supabase = await createClient();
+  await Promise.all(
+    orderedIds.map((id, position) =>
+      supabase.from("w3_lists").update({ position }).eq("id", id),
+    ),
+  );
+  revalidatePath("/lists");
+}
+
 export async function deleteList(listId: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("w3_lists").delete().eq("id", listId);

@@ -3,8 +3,19 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
+  DndContext,
+  closestCenter,
+  PointerSensor,
+  useSensor,
+  useSensors,
+  type DragEndEvent,
+} from "@dnd-kit/core";
+import { SortableContext, arrayMove, rectSortingStrategy, useSortable } from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
+import {
   createList,
   deleteList,
+  reorderLists,
   setListArchived,
   setListColor,
   setListPublic,
@@ -17,9 +28,30 @@ type ListWithItems = Tables<"w3_lists"> & {
   w3_items: { id: string; completed: boolean }[];
 };
 
-export function ListsBoard({ lists }: { lists: ListWithItems[] }) {
+export function ListsBoard({ lists: initialLists }: { lists: ListWithItems[] }) {
   const [query, setQuery] = useState("");
   const [showArchived, setShowArchived] = useState(false);
+  const [lists, setLists] = useState(initialLists);
+
+  // Re-sync local order when the server sends fresh data after a revalidate.
+  const [prevInitialLists, setPrevInitialLists] = useState(initialLists);
+  if (prevInitialLists !== initialLists) {
+    setPrevInitialLists(initialLists);
+    setLists(initialLists);
+  }
+
+  const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
+
+  // Move within the full array so hidden (other tab / filtered-out) lists
+  // keep their relative order, then persist every position.
+  async function handleDragEnd({ active, over }: DragEndEvent) {
+    if (!over || active.id === over.id) return;
+    const oldIndex = lists.findIndex((l) => l.id === active.id);
+    const newIndex = lists.findIndex((l) => l.id === over.id);
+    const reordered = arrayMove(lists, oldIndex, newIndex);
+    setLists(reordered);
+    await reorderLists(reordered.map((l) => l.id));
+  }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
@@ -75,11 +107,15 @@ export function ListsBoard({ lists }: { lists: ListWithItems[] }) {
           {query ? "No lists match your search." : showArchived ? "No archived lists." : "No lists yet — create one above."}
         </p>
       ) : (
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((list) => (
-            <ListCard key={list.id} list={list} />
-          ))}
-        </div>
+        <DndContext sensors={sensors} collisionDetection={closestCenter} onDragEnd={handleDragEnd}>
+          <SortableContext items={filtered.map((l) => l.id)} strategy={rectSortingStrategy}>
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {filtered.map((list) => (
+                <ListCard key={list.id} list={list} />
+              ))}
+            </div>
+          </SortableContext>
+        </DndContext>
       )}
     </div>
   );
@@ -89,12 +125,29 @@ function ListCard({ list }: { list: ListWithItems }) {
   const total = list.w3_items.length;
   const done = list.w3_items.filter((i) => i.completed).length;
   const color = listColor(list.color);
+  const { attributes, listeners, setNodeRef, transform, transition, isDragging } =
+    useSortable({ id: list.id });
 
   return (
     <div
-      className={`group flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 shadow-sm transition-shadow hover:shadow-md ${color ? `border-l-4 ${color.card}` : "bg-white"}`}
+      ref={setNodeRef}
+      style={{
+        transform: CSS.Transform.toString(transform),
+        transition,
+        opacity: isDragging ? 0.5 : 1,
+        zIndex: isDragging ? 10 : undefined,
+      }}
+      className={`group relative flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 shadow-sm transition-shadow hover:shadow-md ${color ? `border-l-4 ${color.card}` : "bg-white"}`}
     >
-      <Link href={`/lists/${list.id}`} className="flex flex-col gap-1">
+      <button
+        {...attributes}
+        {...listeners}
+        aria-label="Drag to reorder"
+        className="absolute top-3 right-3 cursor-grab touch-none text-zinc-400 hover:text-zinc-700"
+      >
+        ⠿
+      </button>
+      <Link href={`/lists/${list.id}`} className="flex flex-col gap-1 pr-6">
         <h2 className="font-medium text-zinc-900">{list.title}</h2>
         <p className="text-sm text-zinc-500">
           {total === 0 ? "No items" : `${done}/${total} done`}
