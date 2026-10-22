@@ -6,8 +6,11 @@ import {
   createList,
   deleteList,
   setListArchived,
+  setListColor,
   setListPublic,
 } from "@/app/lists/actions";
+import { ListColorPicker } from "@/components/ListColorPicker";
+import { listColor } from "@/lib/listColors";
 import type { Tables } from "@/lib/supabase/database.types";
 
 type ListWithItems = Tables<"w3_lists"> & {
@@ -85,9 +88,12 @@ export function ListsBoard({ lists }: { lists: ListWithItems[] }) {
 function ListCard({ list }: { list: ListWithItems }) {
   const total = list.w3_items.length;
   const done = list.w3_items.filter((i) => i.completed).length;
+  const color = listColor(list.color);
 
   return (
-    <div className="group flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 shadow-sm transition-shadow hover:shadow-md">
+    <div
+      className={`group flex flex-col gap-3 rounded-lg border border-zinc-200 p-4 shadow-sm transition-shadow hover:shadow-md ${color ? `border-l-4 ${color.card}` : "bg-white"}`}
+    >
       <Link href={`/lists/${list.id}`} className="flex flex-col gap-1">
         <h2 className="font-medium text-zinc-900">{list.title}</h2>
         <p className="text-sm text-zinc-500">
@@ -98,6 +104,7 @@ function ListCard({ list }: { list: ListWithItems }) {
         <PublicLinkBadge listId={list.id} />
       )}
       <div className="mt-auto flex flex-wrap gap-x-3 gap-y-1 text-xs text-zinc-500">
+        <ListColorPicker value={list.color} onChange={(c) => setListColor(list.id, c)} />
         <button
           onClick={() => setListArchived(list.id, !list.archived)}
           className="hover:text-zinc-900 hover:underline"

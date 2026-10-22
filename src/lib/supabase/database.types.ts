@@ -65,6 +65,7 @@ export type Database = {
       w3_lists: {
         Row: {
           archived: boolean
+          color: string | null
           created_at: string
           id: string
           is_public: boolean
@@ -75,6 +76,7 @@ export type Database = {
         }
         Insert: {
           archived?: boolean
+          color?: string | null
           created_at?: string
           id?: string
           is_public?: boolean
@@ -85,6 +87,7 @@ export type Database = {
         }
         Update: {
           archived?: boolean
+          color?: string | null
           created_at?: string
           id?: string
           is_public?: boolean

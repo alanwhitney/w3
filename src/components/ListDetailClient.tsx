@@ -17,6 +17,7 @@ import {
 } from "@dnd-kit/sortable";
 import {
   setListArchived,
+  setListColor,
   setListPublic,
   updateListTitle,
   deleteList,
@@ -29,6 +30,7 @@ import {
   updateItem,
 } from "@/app/lists/[id]/actions";
 import { DateInput } from "@/components/DateInput";
+import { ListColorPicker } from "@/components/ListColorPicker";
 import { SortableItemRow } from "@/components/SortableItemRow";
 import type { Tables } from "@/lib/supabase/database.types";
 
@@ -161,6 +163,7 @@ export function ListDetailClient({
           >
             {list.is_public ? "Make private" : "Make public"}
           </button>
+          <ListColorPicker value={list.color} onChange={(c) => setListColor(list.id, c)} />
           {list.is_public && (
             <button onClick={copyPublicLink} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100">
               {copied ? "Link copied!" : "Copy public link"}

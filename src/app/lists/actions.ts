@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import type { ListColor } from "@/lib/listColors";
 
 export async function createList(formData: FormData) {
   const title = String(formData.get("title") ?? "").trim() || "Untitled list";
@@ -52,6 +53,17 @@ export async function setListPublic(listId: string, isPublic: boolean) {
   const { error } = await supabase
     .from("w3_lists")
     .update({ is_public: isPublic })
+    .eq("id", listId);
+  if (error) throw new Error(error.message);
+  revalidatePath("/lists");
+  revalidatePath(`/lists/${listId}`);
+}
+
+export async function setListColor(listId: string, color: ListColor | null) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("w3_lists")
+    .update({ color })
     .eq("id", listId);
   if (error) throw new Error(error.message);
   revalidatePath("/lists");
