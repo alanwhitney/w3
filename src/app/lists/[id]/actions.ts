@@ -4,6 +4,24 @@ import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import type { TablesUpdate } from "@/lib/supabase/database.types";
 
+// Close the gaps left by deletes so createItem's count-based position
+// stays past the end of the list.
+async function renumberPositions(
+  supabase: Awaited<ReturnType<typeof createClient>>,
+  listId: string,
+) {
+  const { data: remaining } = await supabase
+    .from("w3_items")
+    .select("id")
+    .eq("list_id", listId)
+    .order("position", { ascending: true });
+  await Promise.all(
+    (remaining ?? []).map(({ id }, position) =>
+      supabase.from("w3_items").update({ position }).eq("id", id),
+    ),
+  );
+}
+
 export async function createItem(
   listId: string,
   input: { who: string; what: string; when_date: string | null; when_time: string | null },
@@ -43,6 +61,7 @@ export async function deleteItem(listId: string, itemId: string) {
   const supabase = await createClient();
   const { error } = await supabase.from("w3_items").delete().eq("id", itemId);
   if (error) throw new Error(error.message);
+  await renumberPositions(supabase, listId);
   revalidatePath(`/lists/${listId}`);
 }
 
@@ -65,16 +84,6 @@ export async function deleteCompletedItems(listId: string) {
     .eq("completed", true);
   if (error) throw new Error(error.message);
 
-  // Close the gaps so createItem's count-based position stays past the end.
-  const { data: remaining } = await supabase
-    .from("w3_items")
-    .select("id")
-    .eq("list_id", listId)
-    .order("position", { ascending: true });
-  await Promise.all(
-    (remaining ?? []).map(({ id }, position) =>
-      supabase.from("w3_items").update({ position }).eq("id", id),
-    ),
-  );
+  await renumberPositions(supabase, listId);
   revalidatePath(`/lists/${listId}`);
 }
