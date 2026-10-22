@@ -21,7 +21,13 @@ import {
   updateListTitle,
   deleteList,
 } from "@/app/lists/actions";
-import { createItem, deleteItem, reorderItems, updateItem } from "@/app/lists/[id]/actions";
+import {
+  createItem,
+  deleteCompletedItems,
+  deleteItem,
+  reorderItems,
+  updateItem,
+} from "@/app/lists/[id]/actions";
 import { DateInput } from "@/components/DateInput";
 import { SortableItemRow } from "@/components/SortableItemRow";
 import type { Tables } from "@/lib/supabase/database.types";
@@ -114,6 +120,15 @@ export function ListDetailClient({
     router.refresh();
   }
 
+  const completedCount = items.filter((i) => i.completed).length;
+
+  async function handleDeleteCompleted() {
+    const noun = completedCount === 1 ? "item" : "items";
+    if (!confirm(`Delete ${completedCount} completed ${noun}? This cannot be undone.`)) return;
+    setItems((prev) => prev.filter((i) => !i.completed));
+    await deleteCompletedItems(list.id);
+  }
+
   async function copyPublicLink() {
     const url = `${window.location.origin}/p/${list.id}`;
     await navigator.clipboard.writeText(url);
@@ -149,6 +164,11 @@ export function ListDetailClient({
           {list.is_public && (
             <button onClick={copyPublicLink} className="rounded-full bg-emerald-50 px-2 py-0.5 text-xs font-medium text-emerald-700 hover:bg-emerald-100">
               {copied ? "Link copied!" : "Copy public link"}
+            </button>
+          )}
+          {completedCount > 0 && (
+            <button onClick={handleDeleteCompleted} className="hover:text-zinc-900 hover:underline">
+              Delete completed ({completedCount})
             </button>
           )}
           <button

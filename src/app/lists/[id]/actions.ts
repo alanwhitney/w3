@@ -55,3 +55,26 @@ export async function reorderItems(listId: string, orderedIds: string[]) {
   );
   revalidatePath(`/lists/${listId}`);
 }
+
+export async function deleteCompletedItems(listId: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("w3_items")
+    .delete()
+    .eq("list_id", listId)
+    .eq("completed", true);
+  if (error) throw new Error(error.message);
+
+  // Close the gaps so createItem's count-based position stays past the end.
+  const { data: remaining } = await supabase
+    .from("w3_items")
+    .select("id")
+    .eq("list_id", listId)
+    .order("position", { ascending: true });
+  await Promise.all(
+    (remaining ?? []).map(({ id }, position) =>
+      supabase.from("w3_items").update({ position }).eq("id", id),
+    ),
+  );
+  revalidatePath(`/lists/${listId}`);
+}
