@@ -56,18 +56,18 @@ export function SortableItemRow({
         onChange={(e) => onChange({ completed: e.target.checked })}
         className="mt-1.5 h-4 w-4 no-print"
       />
-      <div className="grid flex-1 grid-cols-1 gap-2 sm:grid-cols-[1fr_2fr_auto_auto]">
+      <div className="grid min-w-0 flex-1 grid-cols-1 gap-2 sm:grid-cols-[minmax(0,1fr)_minmax(0,2fr)_auto_auto]">
         <input
           value={item.who}
           onChange={(e) => onChange({ who: e.target.value })}
           placeholder="Who"
-          className={`rounded border border-transparent px-2 py-1 hover:border-zinc-200 focus:border-zinc-400 ${item.completed ? "text-zinc-400 line-through" : ""}`}
+          className={`min-w-0 rounded border border-transparent px-2 py-1 hover:border-zinc-200 focus:border-zinc-400 ${item.completed ? "text-zinc-400 line-through" : ""}`}
         />
         <input
           value={item.what}
           onChange={(e) => onChange({ what: e.target.value })}
           placeholder="What"
-          className={`rounded border border-transparent px-2 py-1 hover:border-zinc-200 focus:border-zinc-400 ${item.completed ? "text-zinc-400 line-through" : ""}`}
+          className={`min-w-0 rounded border border-transparent px-2 py-1 hover:border-zinc-200 focus:border-zinc-400 ${item.completed ? "text-zinc-400 line-through" : ""}`}
         />
         <DateInput
           value={item.when_date ?? ""}
