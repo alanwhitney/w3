@@ -195,6 +195,7 @@ export function ListDetailClient({
               <SortableItemRow
                 key={item.id}
                 item={item}
+                listTitle={title}
                 onChange={(patch) => {
                   patchItemLocally(item.id, patch);
                   updateItem(list.id, item.id, patch);

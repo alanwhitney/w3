@@ -3,16 +3,19 @@
 import { useSortable } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
 import { DateInput } from "@/components/DateInput";
+import { googleCalendarUrl } from "@/lib/googleCalendar";
 import type { Tables } from "@/lib/supabase/database.types";
 
 type Item = Tables<"w3_items">;
 
 export function SortableItemRow({
   item,
+  listTitle,
   onChange,
   onDelete,
 }: {
   item: Item;
+  listTitle: string;
   onChange: (patch: Partial<Item>) => void;
   onDelete: () => void;
 }) {
@@ -24,6 +27,14 @@ export function SortableItemRow({
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
+  const calendarUrl = googleCalendarUrl({
+    what: item.what,
+    who: item.who,
+    date: item.when_date,
+    time: item.when_time,
+    listTitle,
+  });
 
   return (
     <div
@@ -70,6 +81,20 @@ export function SortableItemRow({
           className="rounded border border-transparent px-2 py-1 hover:border-zinc-200 focus:border-zinc-400"
         />
       </div>
+      {calendarUrl ? (
+        <a
+          href={calendarUrl}
+          target="_blank"
+          rel="noopener noreferrer"
+          aria-label="Add to Google Calendar"
+          title="Add to Google Calendar"
+          className="no-print mt-1 text-zinc-400 hover:text-blue-600"
+        >
+          📅
+        </a>
+      ) : (
+        <span className="no-print mt-1 w-[1.25em]" aria-hidden />
+      )}
       <button
         onClick={onDelete}
         aria-label="Delete item"
