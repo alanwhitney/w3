@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { PrintButton } from "@/components/PrintButton";
 import { formatWhen } from "@/lib/datetime";
+import { googleCalendarUrl } from "@/lib/googleCalendar";
 
 export default async function PublicListPage({
   params,
@@ -31,11 +32,21 @@ export default async function PublicListPage({
       <p className="no-print mb-2 text-xs font-medium uppercase tracking-wide text-zinc-400">
         Shared list · read only
       </p>
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight">{list.title}</h1>
+      <h1 className={`${list.description ? "mb-2" : "mb-6"} text-2xl font-semibold tracking-tight`}>{list.title}</h1>
+      {list.description && (
+        <p className="mb-6 whitespace-pre-line text-zinc-600">{list.description}</p>
+      )}
       {items && items.length > 0 ? (
         <div className="flex flex-col divide-y divide-zinc-200 border-y border-zinc-200">
           {items.map((item) => {
             const when = formatWhen(item.when_date, item.when_time);
+            const calendarUrl = googleCalendarUrl({
+              what: item.what,
+              who: item.who,
+              date: item.when_date,
+              time: item.when_time,
+              listTitle: list.title,
+            });
             return (
               <div
                 key={item.id}
@@ -47,7 +58,23 @@ export default async function PublicListPage({
                   </p>
                   <p className="text-sm text-zinc-500">{item.who || "Unassigned"}</p>
                 </div>
-                {when && <p className="shrink-0 text-sm text-zinc-500">{when}</p>}
+                {when && (
+                  <p className="shrink-0 text-sm text-zinc-500">
+                    {when}
+                    {calendarUrl && (
+                      <a
+                        href={calendarUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        aria-label="Add to Google Calendar"
+                        title="Add to Google Calendar"
+                        className="no-print ml-2 text-zinc-400 hover:text-blue-600"
+                      >
+                        📅
+                      </a>
+                    )}
+                  </p>
+                )}
               </div>
             );
           })}

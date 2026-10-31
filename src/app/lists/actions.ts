@@ -37,6 +37,16 @@ export async function updateListTitle(listId: string, title: string) {
   revalidatePath(`/lists/${listId}`);
 }
 
+export async function updateListDescription(listId: string, description: string) {
+  const supabase = await createClient();
+  const { error } = await supabase
+    .from("w3_lists")
+    .update({ description: description.trim() || null })
+    .eq("id", listId);
+  if (error) throw new Error(error.message);
+  revalidatePath(`/lists/${listId}`);
+}
+
 export async function setListArchived(listId: string, archived: boolean) {
   const supabase = await createClient();
   const { error } = await supabase

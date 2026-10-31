@@ -20,6 +20,7 @@ import {
   setListColor,
   setListPublic,
   updateListTitle,
+  updateListDescription,
   deleteList,
 } from "@/app/lists/actions";
 import {
@@ -46,6 +47,7 @@ export function ListDetailClient({
 }) {
   const router = useRouter();
   const [title, setTitle] = useState(list.title);
+  const [description, setDescription] = useState(list.description ?? "");
   const [items, setItems] = useState(initialItems);
   const [copied, setCopied] = useState(false);
   const [newWho, setNewWho] = useState("");
@@ -64,6 +66,11 @@ export function ListDetailClient({
   if (prevTitleProp !== list.title) {
     setPrevTitleProp(list.title);
     setTitle(list.title);
+  }
+  const [prevDescriptionProp, setPrevDescriptionProp] = useState(list.description);
+  if (prevDescriptionProp !== list.description) {
+    setPrevDescriptionProp(list.description);
+    setDescription(list.description ?? "");
   }
 
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 4 } }));
@@ -146,6 +153,17 @@ export function ListDetailClient({
           onChange={(e) => setTitle(e.target.value)}
           onBlur={() => title.trim() && title !== list.title && updateListTitle(list.id, title)}
           className="w-full border-b border-transparent bg-transparent text-2xl font-semibold tracking-tight outline-none hover:border-zinc-200 focus:border-zinc-400"
+        />
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          onBlur={() =>
+            description.trim() !== (list.description ?? "") &&
+            updateListDescription(list.id, description)
+          }
+          placeholder="Add a description"
+          rows={1}
+          className={`field-sizing-content w-full resize-none border-b border-transparent bg-transparent text-zinc-600 outline-none hover:border-zinc-200 focus:border-zinc-400 ${description.trim() ? "" : "no-print"}`}
         />
         <div className="no-print flex flex-wrap items-center gap-3 text-sm text-zinc-500">
           <button onClick={() => window.print()} className="hover:text-zinc-900 hover:underline">

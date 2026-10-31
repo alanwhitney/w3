@@ -67,6 +67,7 @@ export type Database = {
           archived: boolean
           color: string | null
           created_at: string
+          description: string | null
           id: string
           is_public: boolean
           owner_id: string
@@ -78,6 +79,7 @@ export type Database = {
           archived?: boolean
           color?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           is_public?: boolean
           owner_id: string
@@ -89,6 +91,7 @@ export type Database = {
           archived?: boolean
           color?: string | null
           created_at?: string
+          description?: string | null
           id?: string
           is_public?: boolean
           owner_id?: string
