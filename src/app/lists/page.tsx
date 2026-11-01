@@ -1,6 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { logout } from "@/app/auth/actions";
 import { ListsBoard } from "@/components/ListsBoard";
+import { LiveRefresh } from "@/components/LiveRefresh";
 
 export default async function ListsPage() {
   const supabase = await createClient();
@@ -31,6 +32,7 @@ export default async function ListsPage() {
         </div>
       </header>
       <ListsBoard lists={lists ?? []} />
+      <LiveRefresh />
     </div>
   );
 }

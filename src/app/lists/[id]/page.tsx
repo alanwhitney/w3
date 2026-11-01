@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
 import { ListDetailClient } from "@/components/ListDetailClient";
+import { LiveRefresh } from "@/components/LiveRefresh";
 
 export default async function ListDetailPage({
   params,
@@ -31,6 +32,7 @@ export default async function ListDetailPage({
         ← All lists
       </Link>
       <ListDetailClient list={list} initialItems={items ?? []} />
+      <LiveRefresh listId={list.id} />
     </div>
   );
 }
