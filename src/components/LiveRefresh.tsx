@@ -11,10 +11,28 @@ const TYPING_QUIET_MS = 1500;
 // Re-fetches the page's server data when lists or items change on another
 // device (Supabase Realtime, filtered by RLS), and when the tab becomes
 // visible again, since phones and sleeping tabs drop the socket.
-export function LiveRefresh({ listId }: { listId?: string }) {
+// With pollMs it skips Realtime and just refreshes on that interval while
+// the tab is visible (used for the public page, which has no inputs).
+export function LiveRefresh({ listId, pollMs }: { listId?: string; pollMs?: number }) {
   const router = useRouter();
 
   useEffect(() => {
+    if (!pollMs) return;
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") router.refresh();
+    }, pollMs);
+    const onVisible = () => {
+      if (document.visibilityState === "visible") router.refresh();
+    };
+    document.addEventListener("visibilitychange", onVisible);
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", onVisible);
+    };
+  }, [pollMs, router]);
+
+  useEffect(() => {
+    if (pollMs) return;
     const supabase = createClient();
     let timer: ReturnType<typeof setTimeout> | undefined;
     let lastInputAt = 0;
@@ -58,7 +76,7 @@ export function LiveRefresh({ listId }: { listId?: string }) {
       document.removeEventListener("visibilitychange", onVisible);
       supabase.removeChannel(channel);
     };
-  }, [listId, router]);
+  }, [listId, pollMs, router]);
 
   return null;
 }

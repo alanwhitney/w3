@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { LiveRefresh } from "@/components/LiveRefresh";
 import { PrintButton } from "@/components/PrintButton";
 import { formatWhen } from "@/lib/datetime";
 import { googleCalendarUrl } from "@/lib/googleCalendar";
@@ -83,6 +84,7 @@ export default async function PublicListPage({
         <p className="text-zinc-500">This list has no items yet.</p>
       )}
       <PrintButton />
+      <LiveRefresh pollMs={30_000} />
     </div>
   );
 }
