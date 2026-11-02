@@ -35,7 +35,7 @@ export default async function PublicListPage({
       </p>
       <h1 className={`${list.description ? "mb-2" : "mb-6"} text-2xl font-semibold tracking-tight`}>{list.title}</h1>
       {list.description && (
-        <p className="mb-6 whitespace-pre-line text-zinc-600">{list.description}</p>
+        <p className="mb-6 whitespace-pre-line break-words text-zinc-600">{list.description}</p>
       )}
       {items && items.length > 0 ? (
         <div className="flex flex-col divide-y divide-zinc-200 border-y border-zinc-200">

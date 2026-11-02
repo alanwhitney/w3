@@ -163,8 +163,12 @@ export function ListDetailClient({
           }
           placeholder="Add a description"
           rows={1}
-          className={`field-sizing-content w-full resize-none border-b border-transparent bg-transparent text-zinc-600 outline-none hover:border-zinc-200 focus:border-zinc-400 ${description.trim() ? "" : "no-print"}`}
+          className="no-print field-sizing-content w-full resize-none border-b border-transparent bg-transparent text-zinc-600 outline-none hover:border-zinc-200 focus:border-zinc-400"
         />
+        {/* A textarea prints at its on-screen height and can't break across pages, so print the text instead. */}
+        {description.trim() && (
+          <p className="hidden whitespace-pre-line break-words text-zinc-600 print:block">{description}</p>
+        )}
         <div className="no-print flex flex-wrap items-center gap-3 text-sm text-zinc-500">
           <button onClick={() => window.print()} className="hover:text-zinc-900 hover:underline">
             Print
